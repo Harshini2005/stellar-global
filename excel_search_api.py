@@ -17,14 +17,14 @@ chroma_client = chromadb.PersistentClient("./db")
 collection_name = "images"
 try:
     image_collection = chroma_client.get_collection(collection_name)
-    print(f"Loaded existing collection: {collection_name}")
+    # print(f"Loaded existing collection: {collection_name}")
 except chromadb.errors.InvalidCollectionException:
     image_collection = chroma_client.create_collection(collection_name, metadata={"hnsw:space": "cosine"})
-    print(f"Created new collection: {collection_name}")
+    # print(f"Created new collection: {collection_name}")
 
 # Load the CLIP model and preprocess
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
+model, preprocess = clip.load("RN50", device=device)
 
 # Function to get image embeddings from a URL
 def get_embeddings_from_url(image_url, model, preprocess, device):
@@ -38,10 +38,10 @@ def get_embeddings_from_url(image_url, model, preprocess, device):
                 image_features = model.encode_image(image).detach().cpu().numpy()
             return image_features
         else:
-            print(f"Failed to fetch image from URL: {image_url}")
+            # print(f"Failed to fetch image from URL: {image_url}")
             return None
     except Exception as e:
-        print(f"Error processing image URL {image_url}: {str(e)}")
+        # print(f"Error processing image URL {image_url}: {str(e)}")
         return None
 
 # Endpoint to upload and embed images
@@ -64,11 +64,11 @@ def embed_images():
             print(f"Skipping row {index}, invalid data.")
             continue
 
-        print(f"Processing: {product_name} ({product_id})")
+        # print(f"Processing: {product_name} ({product_id})")
         embeddings = get_embeddings_from_url(image_url, model, preprocess, device)
 
         if embeddings is None:
-            print(f"Failed to get embeddings for {product_name} ({product_id})")
+            # print(f"Failed to get embeddings for {product_name} ({product_id})")
             continue
 
         image_collection.add(
